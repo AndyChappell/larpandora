@@ -7,6 +7,7 @@
 #include "art/Framework/Core/ModuleMacros.h"
 
 #include "larpandora/LArPandoraInterface/LArPandora.h"
+#include "larpandora/LArPandoraInterface/ArtIOContent.h"
 
 #include <string>
 
@@ -63,7 +64,6 @@ DEFINE_ART_MODULE(StandardPandora)
 #include "larpandoracontent/LArPlugins/LArPseudoLayerPlugin.h"
 #include "larpandoracontent/LArPlugins/LArRotationalTransformationPlugin.h"
 
-
 namespace lar_pandora
 {
 
@@ -86,6 +86,10 @@ void StandardPandora::CreatePandoraInstances()
     m_pPrimaryPandora = new pandora::Pandora();
     PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, LArContent::RegisterAlgorithms(*m_pPrimaryPandora));
     PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, LArContent::RegisterBasicPlugins(*m_pPrimaryPandora));
+
+    // ATTN Art IO-specific bit
+    PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=,
+            ArtIOContent::RegisterAlgorithms(*m_pPrimaryPandora));
 
     // ATTN Potentially ill defined, unless coordinate system set up to ensure that all drift volumes have same wire angles and pitches
     PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::SetPseudoLayerPlugin(*m_pPrimaryPandora, new lar_content::LArPseudoLayerPlugin));
@@ -143,6 +147,13 @@ void StandardPandora::ProvideExternalSteeringParameters(const pandora::Pandora *
     pEventSteeringParameters->m_shouldPerformSliceId = m_shouldPerformSliceId;
     pEventSteeringParameters->m_printOverallRecoStatus = m_printOverallRecoStatus;
     PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, pandora::ExternallyConfiguredAlgorithm::SetExternalParameters(*pPandora, "LArMaster", pEventSteeringParameters));
+
+    // ATTN Art IO-specific bit
+    auto *const pEventSteeringParametersCopy = new lar_content::MasterAlgorithm::ExternalSteeringParameters(
+            *pEventSteeringParameters);
+    PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=,
+            pandora::ExternallyConfiguredAlgorithm::SetExternalParameters(
+                *pPandora, "ArtIOMaster", pEventSteeringParametersCopy));
 }
 
 } // namespace lar_pandora

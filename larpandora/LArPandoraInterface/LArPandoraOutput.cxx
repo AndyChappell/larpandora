@@ -47,10 +47,13 @@
 namespace lar_pandora
 {
 
-void LArPandoraOutput::ProduceArtOutput(const Settings &settings, const IdToHitMap &idToHitMap, art::Event &evt)
+void LArPandoraOutput::ProduceArtOutput(const pandora::Pandora *const pPandoraInstance,
+        const Settings &settings, const IdToHitMap &idToHitMap, art::Event &evt)
 {
     settings.Validate();
-    const std::string instanceLabel(settings.m_shouldProduceAllOutcomes ? settings.m_allOutcomesInstanceLabel : "");
+    const std::string instanceLabel(settings.m_shouldProduceAllOutcomes ?
+            settings.m_instanceLabel + settings.m_allOutcomesInstanceLabel :
+            settings.m_instanceLabel);
     const std::string testBeamInteractionVertexInstanceLabel(instanceLabel + settings.m_testBeamInteractionVerticesInstanceLabel);
 
     // Set up mandatory output collections
@@ -81,8 +84,8 @@ void LArPandoraOutput::ProduceArtOutput(const Settings &settings, const IdToHitM
 
     // Collect immutable lists of pandora collections that we should convert to ART format
     const pandora::PfoVector pfoVector(settings.m_shouldProduceAllOutcomes ?
-        LArPandoraOutput::CollectAllPfoOutcomes(settings.m_pPrimaryPandora) :
-        LArPandoraOutput::CollectPfos(settings.m_pPrimaryPandora));
+        LArPandoraOutput::CollectAllPfoOutcomes(pPandoraInstance) :
+        LArPandoraOutput::CollectPfos(pPandoraInstance));
 
     IdToIdVectorMap pfoToVerticesMap, pfoToTestBeamInteractionVerticesMap;
     const pandora::VertexVector vertexVector(LArPandoraOutput::CollectVertices(pfoVector, pfoToVerticesMap, lar_content::LArPfoHelper::GetVertex));
@@ -115,7 +118,7 @@ void LArPandoraOutput::ProduceArtOutput(const Settings &settings, const IdToHitM
     LArPandoraOutput::BuildParticleMetadata(evt, settings.m_pProducer, instanceLabel, pfoVector, outputParticleMetadata, outputParticlesToMetadata);
 
     if (settings.m_shouldProduceSlices)
-        LArPandoraOutput::BuildSlices(settings, settings.m_pPrimaryPandora, evt, settings.m_pProducer, instanceLabel, pfoVector, idToHitMap, outputSlices, outputParticlesToSlices, outputSlicesToHits);
+        LArPandoraOutput::BuildSlices(settings, pPandoraInstance, evt, settings.m_pProducer, instanceLabel, pfoVector, idToHitMap, outputSlices, outputParticlesToSlices, outputSlicesToHits);
 
     if (settings.m_shouldRunStitching)
         LArPandoraOutput::BuildT0s(evt, settings.m_pProducer, instanceLabel, pfoVector, outputT0s, outputParticlesToT0s);
@@ -991,7 +994,8 @@ LArPandoraOutput::Settings::Settings() :
     m_shouldRunStitching(false),
     m_shouldProduceAllOutcomes(false),
     m_shouldProduceTestBeamInteractionVertices(false),
-    m_isNeutrinoRecoOnlyNoSlicing(false)
+    m_isNeutrinoRecoOnlyNoSlicing(false),
+    m_instanceLabel("")
 {
 }
 

@@ -80,16 +80,19 @@ public:
         std::string             m_testBeamInteractionVerticesInstanceLabel;  ///< The label for the test beam interaction vertices
         bool                    m_isNeutrinoRecoOnlyNoSlicing;               ///< If we are running the neutrino reconstruction only with no slicing
         std::string             m_hitfinderModuleLabel;                      ///< The hit finder module label
+        std::string             m_instanceLabel;                             ///< The label for the instance
     };
 
     /**
      *  @brief  Convert the Pandora PFOs into ART clusters and write into ART event
      *
+     *  @param  pPandoraInstane the Pandora instance to use for producing output
      *  @param  settings the settings
      *  @param  idToHitMap the mapping from Pandora hit ID to ART hit
      *  @param  evt the ART event
      */
-    static void ProduceArtOutput(const Settings &settings, const IdToHitMap &idToHitMap, art::Event &evt);
+    static void ProduceArtOutput(const pandora::Pandora *const pPandoraInstance,
+            const Settings &settings, const IdToHitMap &idToHitMap, art::Event &evt);
 
     /**
      *  @brief  Get the address of a pandora instance with a given name

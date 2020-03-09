@@ -12,6 +12,7 @@
 #include "larpandora/LArPandoraInterface/LArPandoraInput.h"
 #include "larpandora/LArPandoraInterface/LArPandoraOutput.h"
 #include "larpandora/LArPandoraInterface/LArPandoraGeometry.h"
+#include "larpandora/LArPandoraInterface/LArArtIOWrapper.h"
 
 #include <string>
 #include <memory> // std::unique_ptr<>
@@ -24,6 +25,8 @@ namespace lar_pandora
  */
 class LArPandora : public ILArPandora
 {
+typedef std::map<const pandora::Pandora*, const LArArtIOWrapper*> LArPandoraArtIOWrapperMap;
+
 public:
     /**
      *  @brief  Constructor
@@ -32,8 +35,15 @@ public:
      */
     LArPandora(fhicl::ParameterSet const &pset);
 
+    virtual ~LArPandora();
+
     void beginJob();
     void produce(art::Event &evt);
+
+    /**
+     *  @brief Return the ArtIO wrapper associated with the primary Pandora instance
+     */
+    static const LArArtIOWrapper* GetArtIOWrapper(const pandora::Pandora *const pandora);
 
 protected:
     void CreatePandoraInput(art::Event &evt, IdToHitMap &idToHitMap);
@@ -68,7 +78,10 @@ protected:
     LArPandoraOutput::Settings      m_outputSettings;               ///< The lar pandora output settings
 
     LArDriftVolumeMap               m_driftVolumeMap;               ///< The map from volume id to drift volume
+
+    static LArPandoraArtIOWrapperMap m_pandoraIOMap;                ///< The map from Pandora instance to Art IO wrapper
 };
+
 
 } // namespace lar_pandora
 

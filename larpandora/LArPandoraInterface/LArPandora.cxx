@@ -42,6 +42,8 @@
 namespace lar_pandora
 {
 
+LArPandora::LArPandoraArtIOWrapperMap LArPandora::m_pandoraIOMap;
+
 LArPandora::LArPandora(fhicl::ParameterSet const &pset) :
     ILArPandora(pset),
     m_configFile(pset.get<std::string>("ConfigFile")),
@@ -86,10 +88,23 @@ LArPandora::LArPandora(fhicl::ParameterSet const &pset) :
 
     if (m_enableProduction)
     {
+        std::string allInstanceNames = pset.get<std::string>("InstanceLabels", "");
+        auto iss = std::istringstream{allInstanceNames};
+        std::string instanceName{""};
+
         // Set up the instance names to produces
         std::vector<std::string> instanceNames({""});
+        while (iss >> instanceName)
+        {
+            instanceNames.push_back(instanceName);
+        }
+
         if (m_shouldProduceAllOutcomes)
-            instanceNames.push_back(m_allOutcomesInstanceLabel);
+        {
+            const int initSize = instanceNames.size();
+            for (int i = 0; i < initSize; ++i)
+                instanceNames.push_back(instanceNames[i] + m_allOutcomesInstanceLabel);
+        }
 
         for (const std::string &instanceName : instanceNames)
         {
@@ -129,6 +144,16 @@ LArPandora::LArPandora(fhicl::ParameterSet const &pset) :
     }
 }
 
+LArPandora::~LArPandora()
+{
+    auto it = m_pandoraIOMap.find(this->m_pPrimaryPandora);
+    if (it != m_pandoraIOMap.end())
+    {
+        delete it->second;
+        m_pandoraIOMap.erase(it);
+    }
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 void LArPandora::beginJob()
@@ -159,6 +184,13 @@ void LArPandora::beginJob()
     this->ConfigurePandoraInstances();
 }
 
+//------------------------------------------------------------------------------
+
+const LArArtIOWrapper* LArPandora::GetArtIOWrapper(const pandora::Pandora *const pandora)
+{
+    return m_pandoraIOMap.at(pandora);
+}
+
 //------------------------------------------------------------------------------------------------------------------------------------------
 
 void LArPandora::produce(art::Event &evt)
@@ -166,7 +198,7 @@ void LArPandora::produce(art::Event &evt)
     IdToHitMap idToHitMap;
     this->CreatePandoraInput(evt, idToHitMap);
     this->RunPandoraInstances();
-    this->ProcessPandoraOutput(evt, idToHitMap);
+    //this->ProcessPandoraOutput(evt, idToHitMap);
     this->ResetPandoraInstances();
 }
 
@@ -174,6 +206,19 @@ void LArPandora::produce(art::Event &evt)
 
 void LArPandora::CreatePandoraInput(art::Event &evt, IdToHitMap &idToHitMap)
 {
+    auto it = m_pandoraIOMap.find(this->m_pPrimaryPandora);
+    LArArtIOWrapper* wrapper{new LArArtIOWrapper(m_inputSettings, m_outputSettings, idToHitMap, m_driftVolumeMap, evt)};
+
+    if (it == m_pandoraIOMap.end())
+    {   // New input, create new wrapper
+        m_pandoraIOMap.insert(std::make_pair(this->m_pPrimaryPandora, wrapper));
+    }
+    else
+    {   // Updated input, replace wrapper
+        delete it->second;
+        it->second = wrapper;
+    }
+
     // ATTN Should complete gap creation in begin job callback, but channel status service functionality unavailable at that point
     if (!m_lineGapsCreated && m_enableDetectorGaps)
     {
@@ -237,13 +282,15 @@ void LArPandora::ProcessPandoraOutput(art::Event &evt, const IdToHitMap &idToHit
     if (m_enableProduction)
     {
         m_outputSettings.m_shouldProduceAllOutcomes = false;
-        LArPandoraOutput::ProduceArtOutput(m_outputSettings, idToHitMap, evt);
+        LArPandoraOutput::ProduceArtOutput(m_outputSettings.m_pPrimaryPandora,
+                m_outputSettings, idToHitMap, evt);
 
         if (m_shouldProduceAllOutcomes)
         {
             m_outputSettings.m_shouldProduceAllOutcomes = true;
             m_outputSettings.m_allOutcomesInstanceLabel = m_allOutcomesInstanceLabel;
-            LArPandoraOutput::ProduceArtOutput(m_outputSettings, idToHitMap, evt);
+            LArPandoraOutput::ProduceArtOutput(m_outputSettings.m_pPrimaryPandora,
+                    m_outputSettings, idToHitMap, evt);
         }
     }
 }
