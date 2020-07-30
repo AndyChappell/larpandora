@@ -12,6 +12,7 @@
 #include "Api/PandoraApi.h"
 
 #include "larpandora/LArPandoraInterface/ExternalClusteringAlgorithm.h"
+#include "larpandora/LArPandoraInterface/ExternalVertexingAlgorithm.h"
 #include "larpandora/LArPandoraInterface/TestInputAlgorithm.h"
 #include "larpandora/LArPandoraInterface/TestOutputAlgorithm.h"
 #include "larpandora/LArPandoraInterface/ArtIOMasterAlgorithm.h"
@@ -25,6 +26,9 @@ StatusCode ArtIOContent::RegisterAlgorithms(const Pandora &pandora)
 
     PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::RegisterAlgorithmFactory(
                 pandora, "ExternalClustering", new lar_pandora::ExternalClusteringAlgorithm::Factory));
+
+    PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::RegisterAlgorithmFactory(
+                pandora, "ExternalVertexing", new lar_pandora::ExternalVertexingAlgorithm::Factory));
 
     PANDORA_THROW_RESULT_IF(pandora::STATUS_CODE_SUCCESS, !=, PandoraApi::RegisterAlgorithmFactory(
                 pandora, "TestInput", new lar_pandora::TestInputAlgorithm::Factory));

@@ -1,7 +1,7 @@
 /**
  *  @file   larpandora/LArPandoraInterface/ExternalClusteringAlgorithm.cc
  *
- *  @brief  Header file for testing of Art IO.
+ *  @brief  Header file for algorithm creating Pandora clusters from externally generated Art clusters.
  *
  *  $Log: $
  */
