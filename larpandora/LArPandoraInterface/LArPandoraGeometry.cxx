@@ -366,6 +366,33 @@ namespace lar_pandora {
         float driftMinZ(worldCoord1[2] - 0.5f * theTpc1.ActiveLength());
         float driftMaxZ(worldCoord1[2] + 0.5f * theTpc1.ActiveLength());
 
+        {
+            const float newdriftMinX(theTpc1.ActiveBoundingBox().MinX());
+            const float newdriftMaxX(theTpc1.ActiveBoundingBox().MaxX());
+            const float newdriftMinY(theTpc1.ActiveBoundingBox().MinY());
+            const float newdriftMaxY(theTpc1.ActiveBoundingBox().MaxY());
+            const float newdriftMinZ(theTpc1.ActiveBoundingBox().MinZ());
+            const float newdriftMaxZ(theTpc1.ActiveBoundingBox().MaxZ());
+
+            std::cout << "=== TPC 1 Comparisons ===" << std::endl;
+            std::cout << "x drift old (" << driftMinX << "," << driftMaxX << ")   new (" <<
+                newdriftMinX << "," << newdriftMaxX << ")" << std::endl;
+            std::cout << "y drift old (" << driftMinY << "," << driftMaxY << ")   new (" <<
+                newdriftMinY << "," << newdriftMaxY << ")" << std::endl;
+            std::cout << "z drift old (" << driftMinZ << "," << driftMaxZ << ")   new (" <<
+                newdriftMinZ << "," << newdriftMaxZ << ")" << std::endl;
+            std::cout << "=========================" << std::endl;
+        }
+
+        {
+            const double newmin1(0.5 * (driftMinX + driftMaxX) - 0.5 * std::fabs(driftMaxX - driftMinX));
+            const double newmax1(0.5 * (driftMinX + driftMaxX) + 0.5 * std::fabs(driftMaxX - driftMinX));
+
+            std::cout << "=== Min/Max 1 Comparisons ===" << std::endl;
+            std::cout << "old (" << min1 << "," << max1 << ")   new (" << newmin1 << "," << newmax1 << ")" << std::endl;
+            std::cout << "=========================" << std::endl;
+        }
+
         const bool isPositiveDrift(theTpc1.DriftDirection() == geo::kPosX);
 
         UIntSet tpcList;
@@ -413,6 +440,17 @@ namespace lar_pandora {
           const double min2(worldCoord2[0] - 0.5 * theTpc2.ActiveHalfWidth());
           const double max2(worldCoord2[0] + 0.5 * theTpc2.ActiveHalfWidth());
 
+          {
+              const double dminx2{theTpc2.ActiveBoundingBox().MinX()};
+              const double dmaxx2{theTpc2.ActiveBoundingBox().MaxX()};
+              const double newmin2(0.5 * (dminx2 + dmaxx2) - 0.5 * std::fabs(dmaxx2 - dminx2));
+              const double newmax2(0.5 * (dminx2 + dmaxx2) + 0.5 * std::fabs(dmaxx2 - dminx2));
+
+              std::cout << "=== Min/Max 2 Comparisons ===" << std::endl;
+              std::cout << "old (" << min2 << "," << max2 << ")   new (" << newmin2 << "," << newmax2 << ")" << std::endl;
+              std::cout << "=========================" << std::endl;
+          }
+
           if ((min2 > max1) || (min1 > max2)) continue;
 
           cstatList.insert(itpc2);
@@ -424,6 +462,24 @@ namespace lar_pandora {
           const float driftMaxY2(worldCoord2[1] + theTpc2.ActiveHalfHeight());
           const float driftMinZ2(worldCoord2[2] - 0.5f * theTpc2.ActiveLength());
           const float driftMaxZ2(worldCoord2[2] + 0.5f * theTpc2.ActiveLength());
+
+          {
+              const float newdriftMinX2(theTpc2.ActiveBoundingBox().MinX());
+              const float newdriftMaxX2(theTpc2.ActiveBoundingBox().MaxX());
+              const float newdriftMinY2(theTpc2.ActiveBoundingBox().MinY());
+              const float newdriftMaxY2(theTpc2.ActiveBoundingBox().MaxY());
+              const float newdriftMinZ2(theTpc2.ActiveBoundingBox().MinZ());
+              const float newdriftMaxZ2(theTpc2.ActiveBoundingBox().MaxZ());
+
+              std::cout << "=== TPC 2 Comparisons ===" << std::endl;
+              std::cout << "x drift old (" << driftMinX2 << "," << driftMaxX2 << ")   new (" <<
+                  newdriftMinX2 << "," << newdriftMaxX2 << ")" << std::endl;
+              std::cout << "y drift old (" << driftMinY2 << "," << driftMaxY2 << ")   new (" <<
+                  newdriftMinY2 << "," << newdriftMaxY2 << ")" << std::endl;
+              std::cout << "z drift old (" << driftMinZ2 << "," << driftMaxZ2 << ")   new (" <<
+                  newdriftMinZ2 << "," << newdriftMaxZ2 << ")" << std::endl;
+              std::cout << "=========================" << std::endl;
+          }
 
           driftMinX = std::min(driftMinX, driftMinX2);
           driftMaxX = std::max(driftMaxX, driftMaxX2);
