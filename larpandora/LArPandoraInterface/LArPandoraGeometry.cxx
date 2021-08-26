@@ -385,8 +385,11 @@ namespace lar_pandora {
         }
 
         {
-            const double newmin1(0.5 * (driftMinX + driftMaxX) - 0.5 * std::fabs(driftMaxX - driftMinX));
-            const double newmax1(0.5 * (driftMinX + driftMaxX) + 0.5 * std::fabs(driftMaxX - driftMinX));
+//            const double newmin1(0.5 * (driftMinX + driftMaxX) - 0.5 * std::fabs(driftMaxX - driftMinX));
+//            const double newmax1(0.5 * (driftMinX + driftMaxX) + 0.5 * std::fabs(driftMaxX - driftMinX));
+
+            const double newmin1{driftMinX + 0.5 * theTpc1.ActiveHalfWidth()};
+            const double newmax1{driftMaxX - 0.5 * theTpc1.ActiveHalfWidth()};
 
             std::cout << "=== Min/Max 1 Comparisons ===" << std::endl;
             std::cout << "old (" << min1 << "," << max1 << ")   new (" << newmin1 << "," << newmax1 << ")" << std::endl;
@@ -441,10 +444,13 @@ namespace lar_pandora {
           const double max2(worldCoord2[0] + 0.5 * theTpc2.ActiveHalfWidth());
 
           {
-              const double dminx2{theTpc2.ActiveBoundingBox().MinX()};
-              const double dmaxx2{theTpc2.ActiveBoundingBox().MaxX()};
-              const double newmin2(0.5 * (dminx2 + dmaxx2) - 0.5 * std::fabs(dmaxx2 - dminx2));
-              const double newmax2(0.5 * (dminx2 + dmaxx2) + 0.5 * std::fabs(dmaxx2 - dminx2));
+//              const double dminx2{theTpc2.ActiveBoundingBox().MinX()};
+//              const double dmaxx2{theTpc2.ActiveBoundingBox().MaxX()};
+//              const double newmin2(0.5 * (dminx2 + dmaxx2) - 0.5 * std::fabs(dmaxx2 - dminx2));
+//              const double newmax2(0.5 * (dminx2 + dmaxx2) + 0.5 * std::fabs(dmaxx2 - dminx2));
+
+              const double newmin2{theTpc2.ActiveBoundingBox().MinX() + 0.5 * theTpc1.ActiveHalfWidth()};
+              const double newmax2{theTpc2.ActiveBoundingBox().MaxX() - 0.5 * theTpc1.ActiveHalfWidth()};
 
               std::cout << "=== Min/Max 2 Comparisons ===" << std::endl;
               std::cout << "old (" << min2 << "," << max2 << ")   new (" << newmin2 << "," << newmax2 << ")" << std::endl;
