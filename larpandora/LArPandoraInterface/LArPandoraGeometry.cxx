@@ -356,45 +356,15 @@ namespace lar_pandora {
         double worldCoord1[3] = {0., 0., 0.};
         theTpc1.LocalToWorld(localCoord1, worldCoord1);
 
-        const double min1(worldCoord1[0] - 0.5 * theTpc1.ActiveHalfWidth());
-        const double max1(worldCoord1[0] + 0.5 * theTpc1.ActiveHalfWidth());
+        float driftMinX(theTpc1.ActiveBoundingBox().MinX());
+        float driftMaxX(theTpc1.ActiveBoundingBox().MaxX());
+        float driftMinY(theTpc1.ActiveBoundingBox().MinY());
+        float driftMaxY(theTpc1.ActiveBoundingBox().MaxY());
+        float driftMinZ(theTpc1.ActiveBoundingBox().MinZ());
+        float driftMaxZ(theTpc1.ActiveBoundingBox().MaxZ());
 
-        float driftMinX(worldCoord1[0] - theTpc1.ActiveHalfWidth());
-        float driftMaxX(worldCoord1[0] + theTpc1.ActiveHalfWidth());
-        float driftMinY(worldCoord1[1] - theTpc1.ActiveHalfHeight());
-        float driftMaxY(worldCoord1[1] + theTpc1.ActiveHalfHeight());
-        float driftMinZ(worldCoord1[2] - 0.5f * theTpc1.ActiveLength());
-        float driftMaxZ(worldCoord1[2] + 0.5f * theTpc1.ActiveLength());
-
-        {
-            const float newdriftMinX(theTpc1.ActiveBoundingBox().MinX());
-            const float newdriftMaxX(theTpc1.ActiveBoundingBox().MaxX());
-            const float newdriftMinY(theTpc1.ActiveBoundingBox().MinY());
-            const float newdriftMaxY(theTpc1.ActiveBoundingBox().MaxY());
-            const float newdriftMinZ(theTpc1.ActiveBoundingBox().MinZ());
-            const float newdriftMaxZ(theTpc1.ActiveBoundingBox().MaxZ());
-
-            std::cout << "=== TPC 1 (" << icstat << "," << itpc1 << ") Comparisons ===" << std::endl;
-            std::cout << "x drift old (" << driftMinX << "," << driftMaxX << " = " << (driftMaxX - driftMinX) << ")   new (" <<
-                newdriftMinX << "," << newdriftMaxX << " = " << (newdriftMaxX - newdriftMinX) << ")" << std::endl;
-            std::cout << "y drift old (" << driftMinY << "," << driftMaxY << " = " << (driftMaxY - driftMinY) << ")   new (" <<
-                newdriftMinY << "," << newdriftMaxY << " = " << (newdriftMaxY - newdriftMinY) << ")" << std::endl;
-            std::cout << "z drift old (" << driftMinZ << "," << driftMaxZ << " = " << (driftMaxZ - driftMinZ) << ")   new (" <<
-                newdriftMinZ << "," << newdriftMaxZ << " = " << (newdriftMaxZ - newdriftMinZ) << ")" << std::endl;
-            std::cout << "=========================" << std::endl;
-        }
-
-        {
-//            const double newmin1(0.5 * (driftMinX + driftMaxX) - 0.5 * std::fabs(driftMaxX - driftMinX));
-//            const double newmax1(0.5 * (driftMinX + driftMaxX) + 0.5 * std::fabs(driftMaxX - driftMinX));
-
-            const double newmin1{driftMinX + 0.5 * theTpc1.ActiveHalfWidth()};
-            const double newmax1{driftMaxX - 0.5 * theTpc1.ActiveHalfWidth()};
-
-            std::cout << "=== Min/Max 1 Comparisons ===" << std::endl;
-            std::cout << "old (" << min1 << "," << max1 << ")   new (" << newmin1 << "," << newmax1 << ")" << std::endl;
-            std::cout << "=========================" << std::endl;
-        }
+        const double min1{driftMinX + 0.5 * theTpc1.ActiveHalfWidth()};
+        const double max1{driftMaxX - 0.5 * theTpc1.ActiveHalfWidth()};
 
         const bool isPositiveDrift(theTpc1.DriftDirection() == geo::kPosX);
 
@@ -440,52 +410,20 @@ namespace lar_pandora {
           double worldCoord2[3] = {0., 0., 0.};
           theTpc2.LocalToWorld(localCoord2, worldCoord2);
 
-          const double min2(worldCoord2[0] - 0.5 * theTpc2.ActiveHalfWidth());
-          const double max2(worldCoord2[0] + 0.5 * theTpc2.ActiveHalfWidth());
-
-          {
-//              const double dminx2{theTpc2.ActiveBoundingBox().MinX()};
-//              const double dmaxx2{theTpc2.ActiveBoundingBox().MaxX()};
-//              const double newmin2(0.5 * (dminx2 + dmaxx2) - 0.5 * std::fabs(dmaxx2 - dminx2));
-//              const double newmax2(0.5 * (dminx2 + dmaxx2) + 0.5 * std::fabs(dmaxx2 - dminx2));
-
-              const double newmin2{theTpc2.ActiveBoundingBox().MinX() + 0.5 * theTpc1.ActiveHalfWidth()};
-              const double newmax2{theTpc2.ActiveBoundingBox().MaxX() - 0.5 * theTpc1.ActiveHalfWidth()};
-
-              std::cout << "=== Min/Max 2 Comparisons ===" << std::endl;
-              std::cout << "old (" << min2 << "," << max2 << ")   new (" << newmin2 << "," << newmax2 << ")" << std::endl;
-              std::cout << "=========================" << std::endl;
-          }
+          const double min2{theTpc2.ActiveBoundingBox().MinX() + 0.5 * theTpc1.ActiveHalfWidth()};
+          const double max2{theTpc2.ActiveBoundingBox().MaxX() - 0.5 * theTpc1.ActiveHalfWidth()};
 
           if ((min2 > max1) || (min1 > max2)) continue;
 
           cstatList.insert(itpc2);
           tpcList.insert(itpc2);
 
-          const float driftMinX2(worldCoord2[0] - theTpc2.ActiveHalfWidth());
-          const float driftMaxX2(worldCoord2[0] + theTpc2.ActiveHalfWidth());
-          const float driftMinY2(worldCoord2[1] - theTpc2.ActiveHalfHeight());
-          const float driftMaxY2(worldCoord2[1] + theTpc2.ActiveHalfHeight());
-          const float driftMinZ2(worldCoord2[2] - 0.5f * theTpc2.ActiveLength());
-          const float driftMaxZ2(worldCoord2[2] + 0.5f * theTpc2.ActiveLength());
-
-          {
-              const float newdriftMinX2(theTpc2.ActiveBoundingBox().MinX());
-              const float newdriftMaxX2(theTpc2.ActiveBoundingBox().MaxX());
-              const float newdriftMinY2(theTpc2.ActiveBoundingBox().MinY());
-              const float newdriftMaxY2(theTpc2.ActiveBoundingBox().MaxY());
-              const float newdriftMinZ2(theTpc2.ActiveBoundingBox().MinZ());
-              const float newdriftMaxZ2(theTpc2.ActiveBoundingBox().MaxZ());
-
-              std::cout << "=== TPC 2 (" << icstat << "," << itpc2 << ") Comparisons ===" << std::endl;
-              std::cout << "x drift old (" << driftMinX2 << "," << driftMaxX2 << " = " << (driftMaxX2 - driftMinX2) << ")   new (" <<
-                  newdriftMinX2 << "," << newdriftMaxX2 << " = " << (newdriftMaxX2 - newdriftMinX2) << ")" << std::endl;
-              std::cout << "y drift old (" << driftMinY2 << "," << driftMaxY2 << " = " << (driftMaxY2 - driftMinY2) << ")   new (" <<
-                  newdriftMinY2 << "," << newdriftMaxY2 << " = " << (newdriftMaxY2 - newdriftMinY2) << ")" << std::endl;
-              std::cout << "z drift old (" << driftMinZ2 << "," << driftMaxZ2 << " = " << (driftMaxZ2 - driftMinZ2) << ")   new (" <<
-                  newdriftMinZ2 << "," << newdriftMaxZ2 << " = " << (newdriftMaxZ2 - newdriftMinZ2) << ")" << std::endl;
-              std::cout << "=========================" << std::endl;
-          }
+          const float driftMinX2(theTpc2.ActiveBoundingBox().MinX());
+          const float driftMaxX2(theTpc2.ActiveBoundingBox().MaxX());
+          const float driftMinY2(theTpc2.ActiveBoundingBox().MinY());
+          const float driftMaxY2(theTpc2.ActiveBoundingBox().MaxY());
+          const float driftMinZ2(theTpc2.ActiveBoundingBox().MinZ());
+          const float driftMaxZ2(theTpc2.ActiveBoundingBox().MaxZ());
 
           driftMinX = std::min(driftMinX, driftMinX2);
           driftMaxX = std::max(driftMaxX, driftMaxX2);
