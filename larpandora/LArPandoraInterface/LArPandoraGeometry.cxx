@@ -374,7 +374,7 @@ namespace lar_pandora {
             const float newdriftMinZ(theTpc1.ActiveBoundingBox().MinZ());
             const float newdriftMaxZ(theTpc1.ActiveBoundingBox().MaxZ());
 
-            std::cout << "=== TPC 1 Comparisons ===" << std::endl;
+            std::cout << "=== TPC 1 (" << icstat << "," << itpc1 << ") Comparisons ===" << std::endl;
             std::cout << "x drift old (" << driftMinX << "," << driftMaxX << " = " << (driftMaxX - driftMinX) << ")   new (" <<
                 newdriftMinX << "," << newdriftMaxX << " = " << (newdriftMaxX - newdriftMinX) << ")" << std::endl;
             std::cout << "y drift old (" << driftMinY << "," << driftMaxY << " = " << (driftMaxY - driftMinY) << ")   new (" <<
@@ -471,7 +471,7 @@ namespace lar_pandora {
               const float newdriftMinZ2(theTpc2.ActiveBoundingBox().MinZ());
               const float newdriftMaxZ2(theTpc2.ActiveBoundingBox().MaxZ());
 
-              std::cout << "=== TPC 2 Comparisons ===" << std::endl;
+              std::cout << "=== TPC 2 (" << icstat << "," << itpc2 << ") Comparisons ===" << std::endl;
               std::cout << "x drift old (" << driftMinX2 << "," << driftMaxX2 << " = " << (driftMaxX2 - driftMinX2) << ")   new (" <<
                   newdriftMinX2 << "," << newdriftMaxX2 << " = " << (newdriftMaxX2 - newdriftMinX2) << ")" << std::endl;
               std::cout << "y drift old (" << driftMinY2 << "," << driftMaxY2 << " = " << (driftMaxY2 - driftMinY2) << ")   new (" <<
