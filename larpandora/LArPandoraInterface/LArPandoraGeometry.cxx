@@ -375,12 +375,12 @@ namespace lar_pandora {
             const float newdriftMaxZ(theTpc1.ActiveBoundingBox().MaxZ());
 
             std::cout << "=== TPC 1 Comparisons ===" << std::endl;
-            std::cout << "x drift old (" << driftMinX << "," << driftMaxX << ")   new (" <<
-                newdriftMinX << "," << newdriftMaxX << ")" << std::endl;
-            std::cout << "y drift old (" << driftMinY << "," << driftMaxY << ")   new (" <<
-                newdriftMinY << "," << newdriftMaxY << ")" << std::endl;
-            std::cout << "z drift old (" << driftMinZ << "," << driftMaxZ << ")   new (" <<
-                newdriftMinZ << "," << newdriftMaxZ << ")" << std::endl;
+            std::cout << "x drift old (" << driftMinX << "," << driftMaxX << " = " << (driftMaxX - driftMinX) << ")   new (" <<
+                newdriftMinX << "," << newdriftMaxX << " = " << (newdriftMaxX - newdriftMinX) << ")" << std::endl;
+            std::cout << "y drift old (" << driftMinY << "," << driftMaxY << " = " << (driftMaxY - driftMinY) << ")   new (" <<
+                newdriftMinY << "," << newdriftMaxY << " = " << (newdriftMaxY - newdriftMinY) << ")" << std::endl;
+            std::cout << "z drift old (" << driftMinZ << "," << driftMaxZ << " = " << (driftMaxZ - driftMinZ) << ")   new (" <<
+                newdriftMinZ << "," << newdriftMaxZ << " = " << (newdriftMaxZ - newdriftMinZ) << ")" << std::endl;
             std::cout << "=========================" << std::endl;
         }
 
@@ -472,12 +472,12 @@ namespace lar_pandora {
               const float newdriftMaxZ2(theTpc2.ActiveBoundingBox().MaxZ());
 
               std::cout << "=== TPC 2 Comparisons ===" << std::endl;
-              std::cout << "x drift old (" << driftMinX2 << "," << driftMaxX2 << ")   new (" <<
-                  newdriftMinX2 << "," << newdriftMaxX2 << ")" << std::endl;
-              std::cout << "y drift old (" << driftMinY2 << "," << driftMaxY2 << ")   new (" <<
-                  newdriftMinY2 << "," << newdriftMaxY2 << ")" << std::endl;
-              std::cout << "z drift old (" << driftMinZ2 << "," << driftMaxZ2 << ")   new (" <<
-                  newdriftMinZ2 << "," << newdriftMaxZ2 << ")" << std::endl;
+              std::cout << "x drift old (" << driftMinX2 << "," << driftMaxX2 << " = " << (driftMaxX2 - driftMinX2) << ")   new (" <<
+                  newdriftMinX2 << "," << newdriftMaxX2 << " = " << (newdriftMaxX2 - newdriftMinX2) << ")" << std::endl;
+              std::cout << "y drift old (" << driftMinY2 << "," << driftMaxY2 << " = " << (driftMaxY2 - driftMinY2) << ")   new (" <<
+                  newdriftMinY2 << "," << newdriftMaxY2 << " = " << (newdriftMaxY2 - newdriftMinY2) << ")" << std::endl;
+              std::cout << "z drift old (" << driftMinZ2 << "," << driftMaxZ2 << " = " << (driftMaxZ2 - driftMinZ2) << ")   new (" <<
+                  newdriftMinZ2 << "," << newdriftMaxZ2 << " = " << (newdriftMaxZ2 - newdriftMinZ2) << ")" << std::endl;
               std::cout << "=========================" << std::endl;
           }
 
