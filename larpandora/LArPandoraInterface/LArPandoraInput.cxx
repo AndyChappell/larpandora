@@ -59,6 +59,19 @@ namespace lar_pandora {
     auto const detProp = art::ServiceHandle<detinfo::DetectorPropertiesService const>()->DataFor(e);
     LArPandoraDetectorType* detType(detector_functions::GetDetectorType());
 
+    for (const auto & [ vol, driftVolume ] : driftVolumeMap)
+    {
+        std::cout << "Volume ID: " << driftVolume.GetVolumeID() << std::endl;
+        const LArDaughterDriftVolumeList &daughterList{driftVolume.GetTpcVolumeList()};
+        for (const LArDaughterDriftVolume &daughterVolume : daughterList)
+        {
+            std::cout << "   Daughter Cryo: " << daughterVolume.GetCryostat() << " TPC " << daughterVolume.GetTpc() << std::endl;
+            const float x{daughterVolume.GetCenterX()}, y{daughterVolume.GetCenterY()}, z{daughterVolume.GetCenterZ()};
+            const float dx{daughterVolume.GetWidthX()}, dy{daughterVolume.GetWidthY()}, dz{daughterVolume.GetWidthZ()};
+            std::cout << "   Center: (" << x << "," << y << "," << z << ") Width: (" << dx << "," << dy << "," << dz << ")" << std::endl;
+        }
+    }
+
     // Loop over ART hits
     int hitCounter(settings.m_hitCounterOffset);
 
