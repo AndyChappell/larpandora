@@ -424,6 +424,8 @@ namespace lar_pandora {
 
         try {
           mcParticleParameters.m_nuanceCode = neutrino.InteractionType();
+          mcParticleParameters.m_isCC = neutrino.CCNC() == simb::kCC;
+          std::cout << "Is Charged Current: " << mcParticleParameters.m_isCC.Get() << std::endl;
           mcParticleParameters.m_process = lar_content::MC_PROC_INCIDENT_NU;
           mcParticleParameters.m_energy = neutrino.Nu().E();
           mcParticleParameters.m_momentum =
@@ -558,6 +560,9 @@ namespace lar_pandora {
         MCProcessMap processMap;
         FillMCProcessMap(processMap);
         mcParticleParameters.m_nuanceCode = nuanceCode;
+        mcParticleParameters.m_isCC = 0;
+        std::cout << "3D Is Charged Current: " << mcParticleParameters.m_isCC.Get() << std::endl;
+
         if (processMap.find(particle->Process()) != processMap.end()) {
           mcParticleParameters.m_process = processMap[particle->Process()];
         }
