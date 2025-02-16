@@ -374,7 +374,9 @@ namespace lar_pandora {
     const Settings& settings,
     const MCTruthToMCParticles& truthToParticleMap,
     const MCParticlesToMCTruth& particleToTruthMap,
-    const RawMCParticleVector& generatorMCParticleVector)
+    const RawMCParticleVector& generatorMCParticleVector,
+    const IdToHitMap& idToHitMap,
+    const HitsToTrackIDEs& hitToParticleMap)
   {
     mf::LogDebug("LArPandora") << " *** LArPandoraInput::CreatePandoraMCParticles(...) *** "
                                << std::endl;
@@ -426,6 +428,7 @@ namespace lar_pandora {
           mcParticleParameters.m_nuanceCode = neutrino.InteractionType();
           mcParticleParameters.m_process = lar_content::MC_PROC_INCIDENT_NU;
           mcParticleParameters.m_energy = neutrino.Nu().E();
+          mcParticleParameters.m_visibleEnergy = 0.f;
           mcParticleParameters.m_momentum =
             pandora::CartesianVector(neutrino.Nu().Px(), neutrino.Nu().Py(), neutrino.Nu().Pz());
           mcParticleParameters.m_vertex =
@@ -497,6 +500,22 @@ namespace lar_pandora {
     std::map<const simb::MCParticle, bool> primaryGeneratorMCParticleMap;
     LArPandoraInput::FindPrimaryParticles(generatorMCParticleVector, primaryGeneratorMCParticleMap);
 
+    std::map<int, float> particleToDepositionMap;
+    for (const auto &[id, hit] : idToHitMap)
+    {
+      if (hitToParticleMap.find(hit) != hitToParticleMap.end())
+      {
+        const TrackIDEVector& trackCollection{hitToParticleMap.at(hit)};
+        for (const sim::TrackIDE trackIDE : trackCollection)
+        {
+          const int trackID(std::abs(trackIDE.trackID));
+          if (particleToDepositionMap.find(trackID) == particleToDepositionMap.end())
+              particleToDepositionMap[trackID] = 0.f;
+          particleToDepositionMap[trackID] += trackIDE.energy / 1000.f;
+        }
+      }
+    }
+
     for (MCParticleMap::const_iterator iterI = particleMap.begin(), iterEndI = particleMap.end();
          iterI != iterEndI;
          ++iterI) {
@@ -535,6 +554,8 @@ namespace lar_pandora {
       const float pY(particle->Py(firstT));
       const float pZ(particle->Pz(firstT));
       const float E(particle->E(firstT));
+      const float visibleEnergy{particleToDepositionMap.find(particle->TrackId()) != particleToDepositionMap.end() ?
+        particleToDepositionMap[particle->TrackId()] : 0.f};
 
       // Find the source of the mc particle
       int nuanceCode(0);
@@ -567,6 +588,7 @@ namespace lar_pandora {
             << "CreatePandoraMCParticles - found an unknown process" << std::endl;
         }
         mcParticleParameters.m_energy = E;
+        mcParticleParameters.m_visibleEnergy = visibleEnergy;
         mcParticleParameters.m_particleId = particle->PdgCode();
         mcParticleParameters.m_momentum = pandora::CartesianVector(pX, pY, pZ);
         mcParticleParameters.m_vertex = pandora::CartesianVector(vtxX, vtxY, vtxZ);

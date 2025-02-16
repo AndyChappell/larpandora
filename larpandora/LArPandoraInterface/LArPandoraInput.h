@@ -108,7 +108,9 @@ namespace lar_pandora {
     static void CreatePandoraMCParticles(const Settings& settings,
                                          const MCTruthToMCParticles& truthToParticles,
                                          const MCParticlesToMCTruth& particlesToTruth,
-                                         const RawMCParticleVector& generatorMCParticleVector);
+                                         const RawMCParticleVector& generatorMCParticleVector,
+                                         const IdToHitMap& idToHitMap,
+                                         const HitsToTrackIDEs& hitToParticleMap);
 
     /**
      *  @brief Find all primary MCParticles in a given vector of MCParticles

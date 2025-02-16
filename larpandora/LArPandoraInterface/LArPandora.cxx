@@ -230,7 +230,9 @@ namespace lar_pandora {
       LArPandoraInput::CreatePandoraMCParticles(m_inputSettings,
                                                 artMCTruthToMCParticles,
                                                 artMCParticlesToMCTruth,
-                                                generatorArtMCParticleVector);
+                                                generatorArtMCParticleVector,
+                                                idToHitMap,
+                                                artHitsToTrackIDEs);
       LArPandoraInput::CreatePandoraMCLinks2D(m_inputSettings, idToHitMap, artHitsToTrackIDEs);
     }
   }
