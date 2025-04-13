@@ -867,6 +867,7 @@ namespace lar_pandora {
     processMap["muonNuclear"] = lar_content::MC_PROC_MU_NUCLEAR;
     processMap["tInelastic"] = lar_content::MC_PROC_TRITON_INELASTIC;
     processMap["primaryBackground"] = lar_content::MC_PROC_PRIMARY_BACKGROUND;
+    processMap["RadioactiveDecayBase"] = lar_content::MC_PROC_RAD_DECAY_BASE;
   }
 
   //------------------------------------------------------------------------------------------------------------------------------------------
