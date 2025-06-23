@@ -117,7 +117,7 @@ namespace lar_pandora {
      *  @param primaryMCParticleMap map containing primary MCParticles and bool indicating whether particle has been accounted for
      */
     static void FindPrimaryParticles(const RawMCParticleVector& mcParticleVector,
-                                     std::map<const simb::MCParticle, bool>& primaryMCParticleMap);
+                                     std::map<const simb::MCParticle *, bool>& primaryMCParticleMap);
 
     /**
      *  @brief Check whether an MCParticle can be found in a given map
@@ -126,7 +126,7 @@ namespace lar_pandora {
      *  @param primaryMCParticleMap map containing primary MCParticles and bool indicating whether particle has been accounted for
      */
     static bool IsPrimaryMCParticle(const art::Ptr<simb::MCParticle>& mcParticle,
-                                    std::map<const simb::MCParticle, bool>& primaryMCParticleMap);
+                                    std::map<const simb::MCParticle *, bool>& primaryMCParticleMap);
 
     /**
      *  @brief  Create links between the 2D hits and Pandora MC particles

@@ -466,7 +466,7 @@ namespace lar_pandora {
           const int trackID(particle->TrackId());
 
           // Mother/Daughter Links
-          if (particle->Mother() == 0) {
+          if (particle->Mother() == 0 || particle->Process() == "primary") {
             try {
               PANDORA_THROW_RESULT_IF(
                 pandora::STATUS_CODE_SUCCESS,
@@ -492,7 +492,7 @@ namespace lar_pandora {
     int particleCounter(0);
 
     // Find Primary Generator Particles
-    std::map<const simb::MCParticle, bool> primaryGeneratorMCParticleMap;
+    std::map<const simb::MCParticle *, bool> primaryGeneratorMCParticleMap;
     LArPandoraInput::FindPrimaryParticles(generatorMCParticleVector, primaryGeneratorMCParticleMap);
 
     for (MCParticleMap::const_iterator iterI = particleMap.begin(), iterEndI = particleMap.end();
@@ -624,11 +624,11 @@ namespace lar_pandora {
 
   void LArPandoraInput::FindPrimaryParticles(
     const RawMCParticleVector& mcParticleVector,
-    std::map<const simb::MCParticle, bool>& primaryMCParticleMap)
+    std::map<const simb::MCParticle *, bool>& primaryMCParticleMap)
   {
     for (const simb::MCParticle& mcParticle : mcParticleVector) {
       if ("primary" == mcParticle.Process()) {
-        primaryMCParticleMap.emplace(std::make_pair(mcParticle, false));
+        primaryMCParticleMap.emplace(std::make_pair(&mcParticle, false));
       }
     }
   }
@@ -637,11 +637,11 @@ namespace lar_pandora {
 
   bool LArPandoraInput::IsPrimaryMCParticle(
     const art::Ptr<simb::MCParticle>& mcParticle,
-    std::map<const simb::MCParticle, bool>& primaryMCParticleMap)
+    std::map<const simb::MCParticle *, bool>& primaryMCParticleMap)
   {
     for (auto& mcParticleIter : primaryMCParticleMap) {
       if (!mcParticleIter.second) {
-        const simb::MCParticle primaryMCParticle(mcParticleIter.first);
+        const simb::MCParticle &primaryMCParticle(*mcParticleIter.first);
 
         if (std::fabs(primaryMCParticle.Px() - mcParticle->Px()) <
               std::numeric_limits<double>::epsilon() &&
