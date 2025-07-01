@@ -422,6 +422,8 @@ namespace lar_pandora {
             mcParticleParameters.m_nuanceCode = 4000;
           else
             mcParticleParameters.m_nuanceCode = neutrino.InteractionType();
+          mcParticleParameters.m_isCC = neutrino.CCNC() == simb::kCC;
+          mcParticleParameters.m_mode = neutrino.Mode();
           mcParticleParameters.m_process = lar_content::MC_PROC_INCIDENT_NU;
           mcParticleParameters.m_energy = neutrino.Nu().E();
           mcParticleParameters.m_momentum =
@@ -558,6 +560,8 @@ namespace lar_pandora {
       try {
         MCProcessMap processMap;
         FillMCProcessMap(processMap);
+        mcParticleParameters.m_isCC = false;
+        mcParticleParameters.m_mode = lar_content::MCInteractionMode(lar_content::MC_MODE_UNKNOWN);
         mcParticleParameters.m_nuanceCode = nuanceCode;
         if (processMap.find(particle->Process()) != processMap.end()) {
           mcParticleParameters.m_process = processMap[particle->Process()];
