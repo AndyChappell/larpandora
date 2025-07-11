@@ -565,7 +565,7 @@ namespace lar_pandora {
         else {
           mcParticleParameters.m_process = lar_content::MC_PROC_UNKNOWN;
           mf::LogWarning("LArPandora")
-            << "CreatePandoraMCParticles - found an unknown process" << std::endl;
+            << "CreatePandoraMCParticles - found an unknown process: " << particle->Process() << std::endl;
         }
         mcParticleParameters.m_energy = E;
         mcParticleParameters.m_particleId = particle->PdgCode();
@@ -867,6 +867,7 @@ namespace lar_pandora {
     processMap["muonNuclear"] = lar_content::MC_PROC_MU_NUCLEAR;
     processMap["tInelastic"] = lar_content::MC_PROC_TRITON_INELASTIC;
     processMap["primaryBackground"] = lar_content::MC_PROC_PRIMARY_BACKGROUND;
+    processMap["RadioactiveDecayBase"] = lar_content::MC_PROC_RADIOACTIVE_DECAY_BASE;
   }
 
   //------------------------------------------------------------------------------------------------------------------------------------------
