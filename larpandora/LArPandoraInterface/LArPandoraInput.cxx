@@ -367,6 +367,7 @@ namespace lar_pandora {
 
   void LArPandoraInput::CreatePandoraMCParticles(
     const Settings& settings,
+    const HitsToTrackIDEs& hitToParticleMap,
     const MCTruthToMCParticles& truthToParticleMap,
     const MCParticlesToMCTruth& particleToTruthMap,
     const RawMCParticleVector& generatorMCParticleVector)
@@ -380,6 +381,18 @@ namespace lar_pandora {
         << "CreatePandoraMCParticles - primary Pandora instance does not exist ";
 
     const pandora::Pandora* pPandora(settings.m_pPrimaryPandora);
+
+    // Make map of particles to trackIDEs
+    std::unordered_map<int, float> particleToVisibleEnergyMeV;
+    for (const auto &[hit, trackIDEs] : hitToParticleMap)
+    {
+        for (const auto trackIDE : trackIDEs)
+        {
+            if (particleToVisibleEnergyMeV.find(trackIDE.trackID) == particleToVisibleEnergyMeV.end())
+                particleToVisibleEnergyMeV[trackIDE.trackID] = 0;
+            particleToVisibleEnergyMeV[trackIDE.trackID] += trackIDE.energy;
+        }
+    }
 
     // Make indexed list of MC particles
     MCParticleMap particleMap;
@@ -426,6 +439,7 @@ namespace lar_pandora {
           mcParticleParameters.m_mode = neutrino.Mode();
           mcParticleParameters.m_process = lar_content::MC_PROC_INCIDENT_NU;
           mcParticleParameters.m_energy = neutrino.Nu().E();
+          mcParticleParameters.m_visibleEnergy = 0;
           mcParticleParameters.m_momentum =
             pandora::CartesianVector(neutrino.Nu().Px(), neutrino.Nu().Py(), neutrino.Nu().Pz());
           mcParticleParameters.m_vertex =
@@ -572,6 +586,7 @@ namespace lar_pandora {
             << "CreatePandoraMCParticles - found an unknown process" << std::endl;
         }
         mcParticleParameters.m_energy = E;
+        mcParticleParameters.m_visibleEnergy = particleToVisibleEnergyMeV[particle->TrackId()] / 1000;
         mcParticleParameters.m_particleId = particle->PdgCode();
         mcParticleParameters.m_momentum = pandora::CartesianVector(pX, pY, pZ);
         mcParticleParameters.m_vertex = pandora::CartesianVector(vtxX, vtxY, vtxZ);

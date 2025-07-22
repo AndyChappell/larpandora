@@ -102,10 +102,12 @@ namespace lar_pandora {
      *  @brief  Create the Pandora MC particles from the MC particles
      *
      *  @param  settings the settings
+     *  @param  hitToParticleMap mapping from each ART hit to its underlying G4 track ID
      *  @param  truthToParticles  mapping from MC truth to MC particles
      *  @param  particlesToTruth  mapping from MC particles to MC truth
      */
     static void CreatePandoraMCParticles(const Settings& settings,
+                                         const HitsToTrackIDEs& hitToParticleMap,
                                          const MCTruthToMCParticles& truthToParticles,
                                          const MCParticlesToMCTruth& particlesToTruth,
                                          const RawMCParticleVector& generatorMCParticleVector);
