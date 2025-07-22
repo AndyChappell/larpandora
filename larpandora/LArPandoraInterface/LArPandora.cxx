@@ -228,11 +228,12 @@ namespace lar_pandora {
       evt, m_inputSettings, m_driftVolumeMap, artHits, idToHitMap);
 
     if (m_enableMCParticles && (m_disableRealDataCheck || !evt.isRealData())) {
+      LArPandoraInput::CreatePandoraMCLinks2D(m_inputSettings, idToHitMap, artHitsToTrackIDEs);
       LArPandoraInput::CreatePandoraMCParticles(m_inputSettings,
+                                                artHitsToTrackIDEs,
                                                 artMCTruthToMCParticles,
                                                 artMCParticlesToMCTruth,
                                                 generatorArtMCParticleVector);
-      LArPandoraInput::CreatePandoraMCLinks2D(m_inputSettings, idToHitMap, artHitsToTrackIDEs);
     }
   }
 
