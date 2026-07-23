@@ -184,6 +184,17 @@ namespace lar_pandora {
       << " LArPandoraGeometry::GetGlobalView --- found an unknown plane view (not U, V or W) ";
   }
 
+  pandora::HitType LArPandoraGeometry::GetGlobalHitType(const geo::View_t view,
+                                                        const geo::TPCID::TPCID_t tpc,
+                                                        const geo::CryostatID::CryostatID_t cstat,
+                                                        const LArPandoraDetectorType *const detType)
+  {
+    if (view == detType->TargetViewW(tpc, cstat)) return pandora::TPC_VIEW_W;
+    if (view == detType->TargetViewU(tpc, cstat)) return pandora::TPC_VIEW_U;
+    if (view == detType->TargetViewV(tpc, cstat)) return pandora::TPC_VIEW_V;
+    throw cet::exception("LArPandora") << " GetGlobalHitType --- unrecognised wire view ";
+  }
+
   //------------------------------------------------------------------------------------------------------------------------------------------
 
   unsigned int LArPandoraGeometry::GetTpcID(const unsigned int cstat, const unsigned int tpc)
@@ -295,7 +306,8 @@ namespace lar_pandora {
                                                           0.5f * (driftMaxZ + driftMinZ),
                                                           (driftMaxX - driftMinX),
                                                           (driftMaxY - driftMinY),
-                                                          (driftMaxZ - driftMinZ)));
+                                                          (driftMaxZ - driftMinZ),
+                                                          BuildReadoutUnits(geo::TPCID{icstat, itpc1}, detType)));
 
         // Now identify the other TPCs associated with this drift volume
         for (auto const& theTpc2 : theGeometry->Iterate<geo::TPCGeo>(cryostat.ID())) {
@@ -362,7 +374,8 @@ namespace lar_pandora {
                                                             0.5f * (driftMaxZ2 + driftMinZ2),
                                                             (driftMaxX2 - driftMinX2),
                                                             (driftMaxY2 - driftMinY2),
-                                                            (driftMaxZ2 - driftMinZ2)));
+                                                            (driftMaxZ2 - driftMinZ2),
+                                                            BuildReadoutUnits(geo::TPCID{icstat, itpc2}, detType)));
         }
 
         // Create new daughter drift volume (volume ID = 0 to N-1)
@@ -447,6 +460,55 @@ namespace lar_pandora {
     if (daughterVolumeList.empty())
       throw cet::exception("LArPandora") << " LArPandoraGeometry::LoadGlobalDaughterGeometry --- "
                                             "failed to create daughter geometry list ";
+  }
+
+  //------------------------------------------------------------------------------------------------------------------------------------------
+
+  LArPandoraReadoutUnitList LArPandoraGeometry::BuildReadoutUnits(const geo::TPCID &tpcID, const LArPandoraDetectorType *const detType)
+  {
+    auto const &channelReadout{art::ServiceHandle<geo::WireReadout const>()->Get()};
+    LArPandoraReadoutUnitList readoutUnitList;
+
+    // First pass: map Pandora views to planes (via detType - handles HD's U/V swap).
+    std::map<pandora::HitType, const geo::PlaneGeo *> hitTypeToPlane;
+    for (auto const &plane : channelReadout.Iterate<geo::PlaneGeo>(tpcID))
+    {
+      const pandora::HitType globalHitType(LArPandoraGeometry::GetGlobalHitType(plane.View(), tpcID.TPC, tpcID.Cryostat, detType));
+      hitTypeToPlane[globalHitType] = &plane;
+    }
+
+    // Second pass: for each plane, for each wire, compute the valid wire-index range in the other planes.
+    for (auto const &[hitType, pPlane] : hitTypeToPlane)
+    {
+        LArPandoraReadoutChannelList channelList;
+
+        for (unsigned int iChannel = 0; iChannel < channelReadout.Nwires(pPlane->ID()); ++iChannel)
+        {
+            const geo::WireGeo &channel(pPlane->Wire(iChannel));
+            pandora::LArReadoutChannel::ViewChannelIntervalArray intervals;
+            std::size_t slot(0);
+
+            for (auto const &[otherHitType, pOtherPlane] : hitTypeToPlane)
+            {
+                if (otherHitType == hitType) continue;
+
+                // Project both channel endpoints onto the other plane's channel-coordinate axis.
+                const geo::WireID startID(pOtherPlane->NearestWireID(pOtherPlane->MovePointOverPlane(channel.GetStart())));
+                const geo::WireID endID(pOtherPlane->NearestWireID(pOtherPlane->MovePointOverPlane(channel.GetEnd())));
+
+                const unsigned int minChannel(std::min(startID.Wire, endID.Wire));
+                const unsigned int maxChannel(std::max(startID.Wire, endID.Wire));
+
+                intervals[slot++] = {otherHitType, pandora::LArReadoutChannel::ChannelInterval{minChannel, maxChannel}};
+            }
+
+            channelList.emplace_back(iChannel, intervals);
+        }
+
+        readoutUnitList.emplace_back(pPlane->ID().Plane, hitType, channelList);
+    }
+
+    return readoutUnitList;
   }
 
   //------------------------------------------------------------------------------------------------------------------------------------------
