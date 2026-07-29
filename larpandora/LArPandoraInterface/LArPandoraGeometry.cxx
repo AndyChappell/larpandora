@@ -493,13 +493,22 @@ namespace lar_pandora {
                 if (otherHitType == hitType) continue;
 
                 // Project both channel endpoints onto the other plane's channel-coordinate axis.
-                const geo::WireID startID(pOtherPlane->NearestWireID(pOtherPlane->MovePointOverPlane(channel.GetStart())));
-                const geo::WireID endID(pOtherPlane->NearestWireID(pOtherPlane->MovePointOverPlane(channel.GetEnd())));
+                const geo::Point_t start{channel.GetStart()};
+                const geo::Point_t end{channel.GetEnd()};
+                double startInterp{channelReadout.WireCoordinate(start.Y(), start.Z(), pOtherPlane->ID())};
+                double endInterp{channelReadout.WireCoordinate(end.Y(), end.Z(), pOtherPlane->ID())};
+                if (startInterp > endInterp)
+                    std::swap(startInterp, endInterp);
+                int minChannel{static_cast<int>(std::ceil(startInterp))};
+                int maxChannel{static_cast<int>(std::floor(endInterp))};
+                // Just in case the start and end interpolations point to the same channel
+                if (minChannel > maxChannel)
+                    std::swap(minChannel, maxChannel);
+                minChannel = static_cast<unsigned int>(std::clamp(minChannel, 0, static_cast<int>(channelReadout.Nwires(pOtherPlane->ID()))));
+                maxChannel = static_cast<unsigned int>(std::clamp(maxChannel, 0, static_cast<int>(channelReadout.Nwires(pOtherPlane->ID()))));
 
-                const unsigned int minChannel(std::min(startID.Wire, endID.Wire));
-                const unsigned int maxChannel(std::max(startID.Wire, endID.Wire));
-
-                intervals[slot++] = {otherHitType, pandora::LArReadoutChannel::ChannelInterval{minChannel, maxChannel}};
+                intervals[slot++] = {otherHitType, pandora::LArReadoutChannel::ChannelInterval{static_cast<unsigned int>(minChannel),
+                    static_cast<unsigned int>(maxChannel)}};
             }
 
             channelList.emplace_back(iChannel, intervals);
