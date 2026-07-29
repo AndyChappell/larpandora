@@ -504,8 +504,8 @@ namespace lar_pandora {
                 // Just in case the start and end interpolations point to the same channel
                 if (minChannel > maxChannel)
                     std::swap(minChannel, maxChannel);
-                minChannel = static_cast<unsigned int>(std::clamp(minChannel, 0, static_cast<int>(channelReadout.Nwires(pOtherPlane->ID()))));
-                maxChannel = static_cast<unsigned int>(std::clamp(maxChannel, 0, static_cast<int>(channelReadout.Nwires(pOtherPlane->ID()))));
+                minChannel = std::clamp(minChannel, 0, static_cast<int>(channelReadout.Nwires(pOtherPlane->ID())));
+                maxChannel = std::clamp(maxChannel, 0, static_cast<int>(channelReadout.Nwires(pOtherPlane->ID())));
 
                 intervals[slot++] = {otherHitType, pandora::LArReadoutChannel::ChannelInterval{static_cast<unsigned int>(minChannel),
                     static_cast<unsigned int>(maxChannel)}};
