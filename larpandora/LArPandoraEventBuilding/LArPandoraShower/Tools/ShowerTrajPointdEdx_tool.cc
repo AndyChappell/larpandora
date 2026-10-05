@@ -122,7 +122,7 @@ namespace ShowerRecoTools {
     , fSCECorrectEField(pset.get<bool>("SCECorrectEField"))
     , fSCEInputCorrected(pset.get<bool>("SCEInputCorrected"))
     , fSumHitSnippets(pset.get<bool>("SumHitSnippets"))
-    , fApplyCorrectionsInNorm(pset.get<bool>("ApplyCorrectionsInNorm", false))
+    , fApplyCorrectionsInNorm(pset.get<bool>("ApplyCorrectionsInNorm"))
     , fResultsOverrideMode(pset.get<int>("ResultsOverrideMode"))
     , fPFParticleLabel(pset.get<art::InputTag>("PFParticleLabel"))
     , fVerbose(pset.get<int>("Verbose"))

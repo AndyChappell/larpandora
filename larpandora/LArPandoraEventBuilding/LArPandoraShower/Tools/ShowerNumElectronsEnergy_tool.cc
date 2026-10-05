@@ -74,7 +74,7 @@ namespace ShowerRecoTools {
     // Declare stuff
     double fRecombinationFactor;
     bool fApplyCorrectionsInNorm; // Whether to instead apply calorimetry corrections in norm.
-    bool fApplyMCLifetimeCorrection; // Whether to apply MC lifetime correction
+    bool fApplyLifetimeCorrection; // Whether to apply MC lifetime correction
 
   };
 
@@ -84,11 +84,11 @@ namespace ShowerRecoTools {
     , fVerbose(pset.get<int>("Verbose"))
     , fShowerEnergyOutputLabel(pset.get<std::string>("ShowerEnergyOutputLabel"))
     , fShowerBestPlaneOutputLabel(pset.get<std::string>("ShowerBestPlaneOutputLabel"))
-    , fShowerDirectionInputLabel(pset.get<std::string>("ShowerDirectionInputLabel", "ShowerDirection"))
+    , fShowerDirectionInputLabel(pset.get<std::string>("ShowerDirectionInputLabel"))
     , fCalorimetryAlg(pset.get<fhicl::ParameterSet>("CalorimetryAlg"))
     , fRecombinationFactor(pset.get<double>("RecombinationFactor"))
-    , fApplyCorrectionsInNorm(pset.get<bool>("ApplyCorrectionsInNorm", false))
-    , fApplyMCLifetimeCorrection(pset.get<bool>("ApplyMCLifetimeCorrection", true))
+    , fApplyCorrectionsInNorm(pset.get<bool>("ApplyCorrectionsInNorm"))
+    , fApplyLifetimeCorrection(pset.get<bool>("ApplyLifetimeCorrection"))
   {
     if ( fApplyCorrectionsInNorm ) {
       auto tool_psets = pset.get< std::vector< fhicl::ParameterSet > >("NormTools");
@@ -218,12 +218,10 @@ namespace ShowerRecoTools {
     double totalEnergy = 0;
     double correctedtotalCharge = 0;
     double nElectrons = 0;
-    double totalChargePos = 0;
-    geo::Point_t chargeWeightedPosition = {0, 0, 0}; // Initialize charge weighted position
 
     for (auto const& hit : hits) {
 
-      double hitCharge = fApplyMCLifetimeCorrection ? hit->Integral() * fCalorimetryAlg.LifetimeCorrection(clockData, detProp, hit->PeakTime()) : hit->Integral();
+      double hitCharge = fApplyLifetimeCorrection ? hit->Integral() * fCalorimetryAlg.LifetimeCorrection(clockData, detProp, hit->PeakTime()) : hit->Integral();
 
       hitCharge /= fRecombinationFactor;
 

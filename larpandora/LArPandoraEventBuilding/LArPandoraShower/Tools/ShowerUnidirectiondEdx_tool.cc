@@ -85,7 +85,6 @@ namespace ShowerRecoTools {
     , fApplyCorrectionsInNorm(pset.get<bool>("ApplyCorrectionsInNorm", false))
     , fShowerStartPositionInputLabel(pset.get<std::string>("ShowerStartPositionInputLabel"))
     , fInitialTrackHitsInputLabel(pset.get<std::string>("InitialTrackHitsInputLabel"))
-    //, fInitialTrackInputLabel(pset.get<std::string>("InitialTrackInputLabel"))
     , fShowerDirectionInputLabel(pset.get<std::string>("ShowerDirectionInputLabel"))
     , fShowerdEdxOutputLabel(pset.get<std::string>("ShowerdEdxOutputLabel"))
     , fShowerBestPlaneOutputLabel(pset.get<std::string>("ShowerBestPlaneOutputLabel"))
