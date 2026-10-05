@@ -47,6 +47,8 @@ showernumelectronsenergy:{
      ShowerEnergyOutputLabel: "ShowerEnergy"
      ShowerBestPlaneOutputLabel: "ShowerBestPlane"
      ShowerDirectionInputLabel: "ShowerDirection"
+     ApplyCorrectionsInNorm: false
+     ApplyLifetimeCorrection: true
  }
 
 
